@@ -34,6 +34,3 @@ class ConnectionDb {
         return $this->conn;
     }
 }
-
-$conn = new ConnectionDb();
-
