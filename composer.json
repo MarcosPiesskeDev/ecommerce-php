@@ -1,0 +1,24 @@
+{
+    "name": "marcospiesskedev/ecommerce-php",
+    "authors": [
+        {
+            "name":"Marcos"
+        }
+    ],
+    "require": {
+        "phpmailer/phpmailer":"5.2.22",
+        "slim/slim":"2.0",
+        "rain/raintpl":"3.0.0",
+        "vlucas/phpdotenv": "^3.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "":"vendor\\hcodebr\\php-class\\src"
+        }
+    },
+    "config": {
+        "platform": {
+            "php":"7.4.3"
+        }
+    }
+}
