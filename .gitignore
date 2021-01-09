@@ -1,2 +1,5 @@
 #Deleting Vendor
 vendor
+
+#Deleting cache from views
+views-cache
