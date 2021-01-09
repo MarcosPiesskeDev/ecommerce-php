@@ -1,5 +1,5 @@
 <?php
-namespace HcodeEcom\db\ConnectionDb;
+namespace HcodeEcom\db;
 
 use \PDO;
 use PDOException;

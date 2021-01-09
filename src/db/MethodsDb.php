@@ -1,7 +1,7 @@
 <?php
-namespace HcodeEcom\db\MethodsDb;
+namespace HcodeEcom\db;
 
-use HcodeEcom\db\ConnectionDb\ConnectionDb;
+use HcodeEcom\db\ConnectionDb;
 use PDO;
 
 require(__DIR__.'/../../vendor/autoload.php');
