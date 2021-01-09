@@ -2,18 +2,16 @@
 
 session_start();
 
-use HcodeEcom\db\MethodsDb\MethodsDb;
-
 require __DIR__.'/vendor/autoload.php';
 
-$app = new \Slim\Slim();
+use HcodeEcom\pages\Page;
+
+$app = new Slim\Slim();
 
 $app->get("/", function(){
-    $conn = new MethodsDb();
-    
-    $results = $conn->select("SELECT * FROM person");
+   $page = new Page();
 
-    echo json_encode($results);
+   $page->setTpl("index");
 
 });
 
