@@ -19,12 +19,12 @@ class Page{
     }
 
    
-    public function __construct($opts = [])
+    public function __construct($opts = [], $tplDir = '/views/')
     {
         
         $this->options = array_merge($this->defaults, $opts);
         $config = [
-            "tpl_dir"   => $_SERVER['DOCUMENT_ROOT']."/views/",
+            "tpl_dir"   => $_SERVER['DOCUMENT_ROOT'].$tplDir,
             "cache_dir" => $_SERVER['DOCUMENT_ROOT']."/views-cache/",
             "debug"     => false
         ];
