@@ -1,6 +1,6 @@
 <?php
 
-namespace HcodeEcom\modules\models;
+namespace HcodeEcom\modules\user\models;
 
 class User {
     
@@ -51,12 +51,12 @@ class User {
         return $this->password = $password;
     }
 
-    public function getIsAdmin(): bool
+    public function getIsAdmin()
     {
         return $this->isAdmin;
     }
 
-    public function setIsAdmin(bool $isAdmin): bool
+    public function setIsAdmin($isAdmin)
     {
         return $this->isAdmin = $isAdmin;
     }
