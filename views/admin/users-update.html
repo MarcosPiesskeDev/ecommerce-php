@@ -1,0 +1,62 @@
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+<!-- Content Header (Page header) -->
+<section class="content-header">
+  <h1>
+    Lista de Usuários
+  </h1>
+</section>
+
+<!-- Main content -->
+<section class="content">
+
+  <div class="row">
+  	<div class="col-md-12">
+  		<div class="box box-primary">
+        <div class="box-header with-border">
+          <h3 class="box-title">Editar Usuário</h3>
+        </div>
+        <!-- /.box-header -->
+        <!-- form start -->
+        {loop="$user"}
+        <form role="form" action="/admin/users/{$value.id}" method="post">
+          <div class="box-body">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" class="form-control" id="name" name="name" placeholder="Type your name:" value="{$value.name}">
+            </div>
+            <div class="form-group">
+              <label for="username">Username</label>
+              <input type="text" class="form-control" id="username" name="username" placeholder="Type your username"  value="{$value.username}">
+            </div>
+            <div class="form-group">
+              <label for="nrphone">Phone</label>
+              <input type="tel" class="form-control" id="n_phone" name="n_phone" placeholder="Type your phone number"  value="{$value.n_phone}">
+            </div>
+            <div class="form-group">
+              <label for="email">E-mail</label>
+              <input type="email" class="form-control" id="email" name="email" placeholder="Type your email" value="{$value.email}">
+            </div>
+            <div class="form-group">
+              <label for="email">Password</label>
+              <input type="text" class="form-control" id="password" name="password" placeholder="Type your password" value="{$value.password}">
+            </div>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" name="is_admin" value="1" {if="$value.is_admin == 1"}checked{/if}> Admin </label>
+            </div>
+          </div>
+          <!-- /.box-body -->
+          <div class="box-footer">
+            <button type="submit" class="btn btn-primary">Salvar</button>
+          </div>
+        </form>
+        {/loop}
+      </div>
+  	</div>
+  </div>
+
+</section>
+<!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
