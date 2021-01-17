@@ -265,6 +265,110 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
 
+USE `hcode_ecommerce_db` ;
+
+-- -----------------------------------------------------
+-- procedure sp_user_save
+-- -----------------------------------------------------
+
+
+USE `hcode_ecommerce_db`;
+DROP procedure IF EXISTS `hcode_ecommerce_db`.`sp_user_save`;
+
+DELIMITER $$
+USE `hcode_ecommerce_db`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p_user_save`(
+  
+	pname VARCHAR(64),
+  	pusername VARCHAR(64),
+  	ppassword VARCHAR(256),
+  	pemail VARCHAR(128),
+  	pn_phone BIGINT(20),
+  	pis_admin TINYINT
+)
+BEGIN
+	
+    DECLARE vid_person INT;
+    
+    INSERT INTO person (name, email, n_phone)
+    VALUES (pname, pemail, pn_phone);
+    
+    SET vid_person = LAST_INSERT_ID();
+    
+    INSERT INTO user (id_person, username, password, is_admin) 
+    VALUES (vid_person, pusername, ppassword, pis_admin);
+    
+    SELECT * FROM user u INNER JOIN person p USING(id) WHERE u.id = LAST_INSERT_ID();
+END$$
+
+DELIMITER ;
+;
+
+
+USE `hcode_ecommerce_db`;
+DROP procedure IF EXISTS `hcode_ecommerce_db`.`sp_user_update`;
+
+DELIMITER $$
+USE `hcode_ecommerce_db`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p_user_update`(
+	pid_user INT,
+  	pname VARCHAR(64),
+  	pusername VARCHAR(64),
+  	ppassword VARCHAR(256),
+  	pemail VARCHAR(128),
+  	pn_phone BIGINT(20),
+  	pis_admin TINYINT
+)
+BEGIN
+	
+	DECLARE vid_person INT;
+    
+    SELECT user.id_person INTO vid_person FROM user WHERE id = pid_user;
+    
+    UPDATE person
+    SET
+   	name = pname,
+    email = pemail,
+    n_phone = pn_phone
+    WHERE id = vid_person;
+    
+    UPDATE user
+    SET
+    username = pusername,
+    password = ppassword,
+    is_admin = pis_admin
+    WHERE id = pid_user;
+    
+    SELECT * FROM user u INNER JOIN person p USING(id) WHERE u.id = pid_user;
+END$$
+
+DELIMITER ;
+;
+
+
+USE `hcode_ecommerce_db`;
+DROP procedure IF EXISTS `hcode_ecommerce_db`.`p_user_delete`;
+
+DELIMITER $$
+USE `hcode_ecommerce_db`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p_user_delete`(
+	pid_user INT
+)
+BEGIN
+
+	DECLARE vid_person INT;
+    
+    SELECT user.id_person INTO vid_person from user WHERE user.id = pid_user;
+    
+    DELETE FROM user WHERE id = pid_user;
+    
+    DELETE FROM person WHERE id = vid_person;
+    
+END$$
+
+DELIMITER ;
+;
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
