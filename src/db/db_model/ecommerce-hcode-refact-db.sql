@@ -264,16 +264,12 @@ CREATE TABLE IF NOT EXISTS `hcode_ecommerce_db`.`recover_password` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
-
-USE `hcode_ecommerce_db` ;
-
 -- -----------------------------------------------------
--- procedure sp_user_save
+-- procedure p_user_save
 -- -----------------------------------------------------
-
 
 USE `hcode_ecommerce_db`;
-DROP procedure IF EXISTS `hcode_ecommerce_db`.`sp_user_save`;
+DROP procedure IF EXISTS `hcode_ecommerce_db`.`p_user_save`;
 
 DELIMITER $$
 USE `hcode_ecommerce_db`$$
@@ -298,15 +294,28 @@ BEGIN
     INSERT INTO user (id_person, username, password, is_admin) 
     VALUES (vid_person, pusername, ppassword, pis_admin);
     
-    SELECT * FROM user u INNER JOIN person p USING(id) WHERE u.id = LAST_INSERT_ID();
+    SELECT 
+		  u.id, u.id_person, u.username, u.password, u.is_admin, u.date_register,
+		  p.name, p.email, p.n_phone, p.date_register 
+	 FROM 
+		  user u 
+	 INNER JOIN 
+		  person p 
+	 ON 
+		  u.id_person = p.id 
+	 WHERE 
+		  u.id = LAST_INSERT_ID();
 END$$
 
 DELIMITER ;
 ;
 
+-- -----------------------------------------------------
+-- procedure p_user_update
+-- -----------------------------------------------------
 
 USE `hcode_ecommerce_db`;
-DROP procedure IF EXISTS `hcode_ecommerce_db`.`sp_user_update`;
+DROP procedure IF EXISTS `hcode_ecommerce_db`.`p_user_update`;
 
 DELIMITER $$
 USE `hcode_ecommerce_db`$$
@@ -327,24 +336,39 @@ BEGIN
     
     UPDATE person
     SET
-   	name = pname,
-    email = pemail,
-    n_phone = pn_phone
-    WHERE id = vid_person;
-    
-    UPDATE user
+      name = pname,
+      email = pemail,
+      n_phone = pn_phone
+    WHERE 
+      id = vid_person;
+    UPDATE 
+      user
     SET
-    username = pusername,
-    password = ppassword,
-    is_admin = pis_admin
-    WHERE id = pid_user;
+      username = pusername,
+      password = ppassword,
+      is_admin = pis_admin
+    WHERE 
+      id = pid_user;
     
-    SELECT * FROM user u INNER JOIN person p USING(id) WHERE u.id = pid_user;
+    SELECT 
+      u.id, u.id_person, u.username, u.password, u.is_admin, u.date_register, 
+      p.name, p.email, p.n_phone, p.date_register
+    FROM 
+		  user u 
+    INNER JOIN 
+		  person p 
+    ON 
+		  p.id = u.id_person 
+    WHERE 
+	  	u.id = pid_user;
 END$$
 
 DELIMITER ;
 ;
 
+-- -----------------------------------------------------
+-- procedure p_user_delete
+-- -----------------------------------------------------
 
 USE `hcode_ecommerce_db`;
 DROP procedure IF EXISTS `hcode_ecommerce_db`.`p_user_delete`;
@@ -358,7 +382,7 @@ BEGIN
 
 	DECLARE vid_person INT;
     
-    SELECT user.id_person INTO vid_person from user WHERE user.id = pid_user;
+    SELECT user.id_person INTO vid_person FROM user WHERE user.id = pid_user;
     
     DELETE FROM user WHERE id = pid_user;
     
@@ -368,6 +392,37 @@ END$$
 
 DELIMITER ;
 ;
+
+-- -----------------------------------------------------
+-- procedure p_user_pass_recover_create
+-- -----------------------------------------------------
+
+USE `hcode_ecommerce_db`;
+DROP procedure IF EXISTS `hcode_ecommerce_db`.`p_user_pass_recover_create`;
+
+DELIMITER $$
+USE `hcode_ecommerce_db`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p_user_pass_recover_create`(
+	pid_user INT,
+  	pip VARCHAR(45)
+)
+BEGIN
+	
+    INSERT INTO recover_password (id_user, ip) 
+    VALUES (pid_user, pip);
+    
+  SELECT 
+		rpass.id, rpass.id_user, rpass.ip, rpass.date_recovery, rpass.date_register
+	FROM 
+		recover_password rpass
+	WHERE 
+		id = LAST_INSERT_ID();
+    
+END$$
+
+DELIMITER ;
+;
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
