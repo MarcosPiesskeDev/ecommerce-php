@@ -27,6 +27,7 @@ class Page{
         $config = [
             "tpl_dir"   => $_SERVER['DOCUMENT_ROOT'].$tplDir,
             "cache_dir" => $_SERVER['DOCUMENT_ROOT']."/views-cache/",
+            "auto_escape"   => false,
             "debug"     => false
         ];
        
