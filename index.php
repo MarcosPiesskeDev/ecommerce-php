@@ -102,13 +102,15 @@ $app->post("/admin/users/create", function(){
    $user = new User();
    $person = new Person();
 
+   $passEncrypted = openssl_encrypt($_POST['password'], 'AES-256-CBC', pack('a16', getenv('SECRET')), 0, pack('a16',getenv('SECRET_IV')));
+
    $_POST['is_admin'] = (isset($_POST['is_admin'])) ? 1 : 0;
 
    $person->setName($_POST['name']);
    $person->setEmail($_POST['email']);
    $person->setNPhone($_POST['n_phone']);
    $user->setUsername($_POST['username']);
-   $user->setPassword($_POST['password']);
+   $user->setPassword($passEncrypted);
    $user->setIsAdmin($_POST['is_admin']);
 
    $userRepo->createUserAndPerson($user, $person);
@@ -144,7 +146,64 @@ $app->post("/admin/users/:idUser", function($idUser){
    exit();
 });
 
+$app->get("/admin/forgot", function(){
 
+   $page = new PageAdmin([
+      "header" => false,
+      "footer" => false
+   ]);
 
+   $page->setTpl("forgot");
+});
+
+$app->post("/admin/forgot", function(){
+   UserRepository::getUserByEmailToRecoverPass($_POST['email']);
+   header("Location: /admin/forgot/sent");
+   exit();
+
+});
+
+$app->get("/admin/forgot/sent", function(){
+   $page = new PageAdmin([
+      "header"=>false,
+      "footer"=>false
+   ]);
+
+   $page->setTpl("forgot-sent");
+});
+
+$app->get("/admin/forgot/reset", function(){
+   
+   $userRepo = new UserRepository();
+
+   $forgot = $userRepo->validForgotDecrypt($_GET['code']);
+   $page = new PageAdmin([
+      "header"=>false,
+      "footer"=>false
+   ]);
+
+   $page->setTpl('forgot-reset', [
+      "name"   => $forgot['name'],
+      "code"   => $_GET['code']
+   ]);
+});
+
+$app->post("/admin/forgot/reset", function(){
+   $userRepo = new UserRepository();
+
+   $forgot = $userRepo->validForgotDecrypt($_POST['code']);
+
+   $userRepo->setDateToForgotPassword($forgot['id']);
+
+   $userRepo->setForgotPassword($forgot['id_user'], $_POST['password']);
+
+   $page = new PageAdmin([
+      "header"=>false,
+      "footer"=>false
+   ]);
+
+   $page->setTpl("forgot-reset-success");
+
+});
 
 $app->run();
