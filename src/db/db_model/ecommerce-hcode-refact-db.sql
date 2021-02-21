@@ -85,7 +85,7 @@ DEFAULT CHARACTER SET = utf8;
 -- Table `hcode_ecommerce_db`.`cart`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `hcode_ecommerce_db`.`cart` (
-  `id` INT(11) NOT NULL,
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
   `security_session_id` VARCHAR(64) NOT NULL,
   `id_user` INT(11) NULL DEFAULT NULL,
   `id_address` INT(11) NULL DEFAULT NULL,
@@ -102,7 +102,7 @@ DEFAULT CHARACTER SET = utf8;
 -- Table `hcode_ecommerce_db`.`product`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `hcode_ecommerce_db`.`product` (
-  `id` INT(11) NOT NULL,
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(64) NOT NULL,
   `price` DECIMAL(10,2) NOT NULL,
   `width` DECIMAL(10,2) NOT NULL,
@@ -204,7 +204,7 @@ DEFAULT CHARACTER SET = utf8;
 -- Table `hcode_ecommerce_db`.`product_category`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `hcode_ecommerce_db`.`product_category` (
-  `id` INT(11) NOT NULL,
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
   `id_product` INT(11) NOT NULL,
   PRIMARY KEY (`id`, `id_product`),
   INDEX `fk_productscategories_products_idx` (`id_product` ASC) VISIBLE,
@@ -423,6 +423,90 @@ END$$
 DELIMITER ;
 ;
 
+USE `hcode_ecommerce_db`;
+DROP procedure IF EXISTS `p_category_save`;
+
+DELIMITER $$
+USE `hcode_ecommerce_db`$$
+CREATE PROCEDURE `p_category_save`(
+	pid INT,
+  	pcategory VARCHAR(64)
+)
+
+BEGIN
+
+	IF pid > 0 THEN
+		UPDATE category c
+        SET c.category = pcategory
+        WHERE c.id = pid;
+    ELSE
+    	INSERT INTO category (category) VALUES (pcategory);
+        SET pid = LAST_INSERT_ID();
+        
+    END IF;
+    
+    SELECT 
+		  c.id, c.category, c.date_register
+    FROM
+    	category c
+    WHERE
+    	c.id = pid;
+END$$
+
+DELIMITER ;
+
+USE `hcode_ecommerce_db`;
+DROP procedure IF EXISTS `p_product_save`;
+
+DELIMITER $$
+USE `hcode_ecommerce_db`$$
+CREATE PROCEDURE `p_product_save`(
+  pid INT(11),
+  pname VARCHAR(64),
+  pprice decimal(10,2),
+  pwidth decimal(10,2),
+  pheight decimal(10,2),
+  plength decimal(10,2),
+  pweight decimal(10,2),
+  purl varchar(128)
+)
+BEGIN
+	IF pid > 0 THEN
+    	
+        UPDATE product
+        SET
+        	name = pname,
+            price = pprice,
+            width = pwidth,
+            height = pheight,
+            length = plength,
+            weight = pweight,
+            url = purl
+        WHERE id = pid;
+	
+    ELSE
+    	
+        INSERT INTO 
+        	product(
+              name, price, width, height, length, weight, url
+            )
+        VALUES(
+        	  pname, pprice, pwidth, pheight, plength, pweight, purl
+        );
+        
+        SET pid = LAST_INSERT_ID();
+    
+    END IF;
+    
+    SELECT 
+    	p.id, p.name, p.price, p.width, p.height, p.length, p.weight, p.url
+    FROM 
+    	product p
+    WHERE
+    	p.id = pid;
+END$$
+
+DELIMITER ;
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

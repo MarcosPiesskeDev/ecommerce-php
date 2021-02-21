@@ -13,6 +13,8 @@ interface IUser{
 
     public function getAllUsers();
 
+    public function getUserById(int $id);
+
     public function createUserAndPerson(User $user, Person $person);
 
     public function getUserAndPersonById(int $id): array;
