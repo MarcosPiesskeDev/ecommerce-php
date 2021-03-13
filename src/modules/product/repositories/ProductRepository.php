@@ -57,8 +57,9 @@ class ProductRepository implements IProduct{
     public function getAllProducts()
     {
         $conn = new MethodsDb();
+        $product = new Product();
 
-        return $conn->select(
+        $results = $conn->select(
             "SELECT 
                 p.id, p.name, p.price, p.width, p.height, p.length, p.weight, p.url, p.date_register 
             FROM 
@@ -66,6 +67,36 @@ class ProductRepository implements IProduct{
             ORDER BY
                 p.name"
         );
+        
+        $data = [];
+       foreach($results as $value){
+        $product->setId($value['id']);
+        $product->setName($value['name']);
+        $product->setPrice($value['price']);
+        $product->setWidth($value['width']);
+        $product->setHeight($value['height']);
+        $product->setLength($value['length']);
+        $product->setWeight($value['weight']);
+        $product->setUrl($value['url']);
+        $product->setDateRegister($value['date_register']);
+        $product->setPhoto($this->checkPhoto($value['id']));
+
+        $i = [
+            'id'            => $product->getId(),
+            'name'          => $product->getName(),
+            'price'         => $product->getPrice(),
+            'width'         => $product->getWidth(),
+            'height'        => $product->getHeight(),
+            'length'        => $product->getLength(),
+            'weight'        => $product->getWeight(),
+            'url'           => $product->getUrl(),
+            'date_register' => $product->getDateRegister(),
+            'photo'         => $product->getPhoto(),
+        ];
+        array_push($data, $i);
+    }
+      
+        return $data;
     }
 
     public function getProductById(int $id)

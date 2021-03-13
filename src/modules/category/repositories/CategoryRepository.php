@@ -5,6 +5,8 @@ namespace HcodeEcom\modules\category\repository;
 use HcodeEcom\db\MethodsDb;
 use HcodeEcom\modules\category\interfaces\ICategory;
 use HcodeEcom\modules\category\models\Category;
+use HcodeEcom\modules\product\models\Product;
+use HcodeEcom\modules\product\repository\ProductRepository;
 
 class CategoryRepository implements ICategory{
 
@@ -115,5 +117,133 @@ class CategoryRepository implements ICategory{
         }
 
         file_put_contents($_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . "views" . DIRECTORY_SEPARATOR . "categories-menu.html", implode('', $html));
+    }
+
+    public function getProductsFromCategoryRelated(int $idCategory, $related = true)
+    {
+        $product = new Product();
+        $productRepo = new ProductRepository();
+        $conn = new MethodsDb();
+        $data = [];
+        if ($related === true){
+            $results = $conn->select(
+            "SELECT 
+                p.id, p.name, p.price, p.width, p.height, p.length, p.weight, p.url, p.date_register
+            FROM 
+                product p
+            WHERE
+                p.id IN (
+            SELECT 
+                p.id
+            FROM
+                product p
+            INNER JOIN 
+                product_category pc
+            ON
+                p.id = pc.id_product
+            WHERE pc.id_category = '".$idCategory."'
+            );"
+        );
+
+            foreach($results as $value){
+                $product->setId($value['id']);
+                $product->setName($value['name']);
+                $product->setPrice($value['price']);
+                $product->setWidth($value['width']);
+                $product->setHeight($value['height']);
+                $product->setLength($value['length']);
+                $product->setWeight($value['weight']);
+                $product->setUrl($value['url']);
+                $product->setDateRegister($value['date_register']);
+                $product->setPhoto($productRepo->checkPhoto($value['id']));
+        
+                $i = [
+                    'id'            => $product->getId(),
+                    'name'          => $product->getName(),
+                    'price'         => $product->getPrice(),
+                    'width'         => $product->getWidth(),
+                    'height'        => $product->getHeight(),
+                    'length'        => $product->getLength(),
+                    'weight'        => $product->getWeight(),
+                    'url'           => $product->getUrl(),
+                    'date_register' => $product->getDateRegister(),
+                    'photo'         => $product->getPhoto(),
+                ];
+                array_push($data, $i);
+            }
+            return $data;
+        }else{
+            $results = $conn->select(
+                "SELECT 
+                p.id, p.name, p.price, p.width, p.height, p.length, p.weight, p.url, p.date_register
+                FROM 
+                    product p
+                WHERE
+                    p.id NOT IN (
+                SELECT 
+                    p.id
+                FROM
+                    product p
+                INNER JOIN 
+                    product_category pc
+                ON
+                    p.id = pc.id_product
+                WHERE pc.id_category = '".$idCategory."'
+                );"
+            );
+            foreach($results as $value){
+                $product->setId($value['id']);
+                $product->setName($value['name']);
+                $product->setPrice($value['price']);
+                $product->setWidth($value['width']);
+                $product->setHeight($value['height']);
+                $product->setLength($value['length']);
+                $product->setWeight($value['weight']);
+                $product->setUrl($value['url']);
+                $product->setDateRegister($value['date_register']);
+                $product->setPhoto($productRepo->checkPhoto($value['id']));
+        
+                $i = [
+                    'id'            => $product->getId(),
+                    'name'          => $product->getName(),
+                    'price'         => $product->getPrice(),
+                    'width'         => $product->getWidth(),
+                    'height'        => $product->getHeight(),
+                    'length'        => $product->getLength(),
+                    'weight'        => $product->getWeight(),
+                    'url'           => $product->getUrl(),
+                    'date_register' => $product->getDateRegister(),
+                    'photo'         => $product->getPhoto(),
+                ];
+                array_push($data, $i);
+            }
+            return $data; 
+        }
+    }
+
+    public function addProductOnCategory(int $idCategory, $product)
+    {
+        $conn = new MethodsDb();
+        $conn->query(
+            "INSERT INTO 
+                product_category (id_category, id_product) 
+            VALUES 
+                ('".$idCategory."', '".$product['product']['id']."');
+            "
+        );  
+    }
+
+    public function removeProductOnCategory(int $idCategory, $product)
+    {
+        $conn = new MethodsDb();
+        $conn->query(
+            "DELETE FROM 
+                product_category 
+            WHERE 
+                id_category = '".$idCategory."' 
+            AND
+                id_product = '".$product['product']['id']."';
+            "
+        );
     }
 }
