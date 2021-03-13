@@ -3,6 +3,7 @@
 require __DIR__.'/../vendor/autoload.php';
 
 use HcodeEcom\modules\person\models\Person;
+use HcodeEcom\modules\product\repository\ProductRepository;
 use HcodeEcom\modules\user\models\User;
 use HcodeEcom\modules\user\repositories\UserRepository;
 use HcodeEcom\pages\Page;
@@ -11,11 +12,15 @@ use HcodeEcom\pages\PageAdmin;
 $app = new Slim\Slim();
 
 $app->get("/", function(){
+   $productRepo = new ProductRepository();
+   
+   $products = $productRepo->getAllProducts();
    $page = new Page();
-
-   $page->setTpl("index");
-
+   $page->setTpl("index", [
+      'products'=>$products
+   ]);
 });
+
 
 $app->get("/admin", function(){
 

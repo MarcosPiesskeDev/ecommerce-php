@@ -11,7 +11,6 @@ $app->get("/admin/products", function(){
     UserRepository::verifyLogin();
     $productRepo = new ProductRepository();
     $products = $productRepo->getAllProducts();
-
     $page = new PageAdmin();
 
     $page->setTpl("products", [
