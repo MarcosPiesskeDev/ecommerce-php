@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS `hcode_ecommerce_db`.`cart` (
   PRIMARY KEY (`id`),
   INDEX `FK_carts_users_idx` (`id_user` ASC) VISIBLE,
   INDEX `fk_carts_addresses_idx` (`id_address` ASC) VISIBLE)
-ENGINE = ARCHIVE
+ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
 
@@ -205,11 +205,12 @@ DEFAULT CHARACTER SET = utf8;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `hcode_ecommerce_db`.`product_category` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `id_category` INT(11) NOT NULL,
   `id_product` INT(11) NOT NULL,
-  PRIMARY KEY (`id`, `id_product`),
+  PRIMARY KEY (`id`, `id_category`, `id_product`),
   INDEX `fk_productscategories_products_idx` (`id_product` ASC) VISIBLE,
   CONSTRAINT `fk_productscategories_categories`
-    FOREIGN KEY (`id`)
+    FOREIGN KEY (`id_category`)
     REFERENCES `hcode_ecommerce_db`.`category` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
