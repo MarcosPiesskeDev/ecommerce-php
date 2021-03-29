@@ -47,11 +47,11 @@
             </div>
             <div class="checkbox">
               <label>
-                <input type="checkbox" name="is_admin" value="1"> Admin Access
+                <input type="checkbox" name="is_admin" id="is_admin_checkbox"> Admin Access
               </label>
             </div>
           </div>
-          <!-- /.box-body -->
+          <!-- /.box-body value="1"-->
           <div class="box-footer">
             <button type="submit" class="btn btn-success">Register</button>
           </div>
@@ -59,6 +59,17 @@
       </div>
   	</div>
   </div>
+
+  <script>
+    let checkboxIsAdmin = document.getElementById('is_admin_checkbox');
+    if(!checkboxIsAdmin.checked){
+      checkboxIsAdmin.value = 1;
+    }else{
+      checkboxIsAdmin.value = 0;
+      console.log(checkboxIsAdmin.value);
+    }
+    
+  </script>
 
 </section>
 <!-- /.content -->

@@ -1,0 +1,142 @@
+<div class="product-big-title-area">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="product-bit-title text-center">
+                    <h2>Cart</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> <!-- End Page title area -->
+<div class="single-product-area">
+    <div class="zigzag-bottom"></div>
+    <div class="container">
+        <div class="row">
+            <script type="text/javascript">
+                
+            </script>
+            
+            <div class="col-md-12">
+                <div class="product-content-right">
+                    <div class="woocommerce">
+
+                        <form action="/checkout">
+                            {if="$error != ''"}
+                            <div class="alert alert-danger" role="alert">
+                            {$error}
+                            </div>
+                            {/if}
+                            <table cellspacing="0" class="shop_table cart">
+                                <thead>
+                                    <tr>
+                                        <th class="product-remove">&nbsp;</th>
+                                        <th class="product-thumbnail">&nbsp;</th>
+                                        <th class="product-name">Product</th>
+                                        <th class="product-price">Price</th>
+                                        <th class="product-quantity">Amount</th>
+                                        <th class="product-subtotal">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {loop="$products"}
+                                    <tr class="cart_item">
+                                        <td class="product-remove">
+                                            <a title="Remove this item" class="remove" href="/cart/{$value.id}/remove">×</a> 
+                                        </td>
+
+                                        <td class="product-thumbnail">
+                                            <a href="/products/{$value.url}"><img width="145" height="145" alt="poster_1_up" class="shop_thumbnail" src="{$value.photo}"></a>
+                                        </td>
+
+                                        <td class="product-name">
+                                            <a href="/products/{$value.url}">{$value.name}</a> 
+                                        </td>
+
+                                        <td class="product-price">
+                                            <span class="amount">R${$value.price}</span> 
+                                        </td>
+
+                                        <td class="product-quantity">
+                                            <div class="quantity buttons_added">
+                                                <input type="button" class="minus" value="-" onclick="window.location.href = '/cart/{$value.id}/minus?zipCode='+zipCode">
+                                                <input type="number" size="4" class="input-text qty text" title="Qty" value="{$value.amount}" min="0" step="1">
+                                                <input type="button" class="plus" value="+" onclick="window.location.href = '/cart/{$value.id}/add?zipCode='+zipCode">
+                                            </div>
+                                        </td>
+
+                                        <td class="product-subtotal">
+                                            <span class="amount">R${$value.total_value}</span> 
+                                        </td>
+                                    </tr>
+                                    {/loop}
+                                </tbody>
+                            </table>
+
+                            <div class="cart-collaterals">
+
+                                <div class="cross-sells">
+
+                                    <h2>Freight calculate</h2>
+                                    
+                                    <div class="coupon">
+                                        <label for="cep">Zip Code:</label>
+                                        <input type="text" placeholder="00000-000" value="" id="cep" class="input-text" name="zipcode">
+                                        <input type="submit" formmethod="post" formaction="/cart/freight" value="Calculate" class="button">
+                                    </div>
+
+                                </div>
+
+                                <div class="cart_totals ">
+
+                                    <h2>Summary of Purchase</h2>
+
+                                    <table cellspacing="0">
+                                        <tbody>
+                                            <tr class="cart-subtotal">
+                                                <th>Subtotal</th>
+                                                <td><span class="amount">R${$totals.subTotal}</span></td>
+                                            </tr>
+                                        
+                                            <tr class="shipping">
+                                                <th>Freight</th>
+                                                <td>R$ {$cart.freight} | Time to arrive: <span id="getTimeSpan"></span> days</td>
+                                            </tr>
+
+                                            <tr class="order-total">
+                                                <th>Total</th>
+                                                <td><strong><span class="amount">R${$totals.total}</span></strong> </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+
+                            <div class="pull-right">
+                                <input type="submit" value="Finalizar Compra" name="proceed" class="checkout-button button alt wc-forward">
+                            </div>
+
+                        </form>
+
+                    </div>                        
+                </div>                    
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    let url_string = window.location.href;
+    let url = new URL(url_string);
+    var zipCode = url.searchParams.get("zipCode");
+    let time = url.searchParams.get("getTime");
+    let span = document.getElementById("getTimeSpan");
+    if (time> 0){
+        span.innerHTML = time;
+    }else{
+        span.innerHTML = 0;
+    }
+    
+    document.getElementById("cep").value = zipCode; 
+</script>

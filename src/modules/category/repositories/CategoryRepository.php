@@ -246,4 +246,68 @@ class CategoryRepository implements ICategory{
             "
         );
     }
+    
+    public function getProductPages(int $idCategory, $page = 1, $itensPerPage = 5)
+    {
+
+        $start = ($page-1)*$itensPerPage;
+        $product = new Product();
+        $conn = new MethodsDb();
+        $productRepo = new ProductRepository();
+
+        $results = $conn->select(
+            "SELECT 
+                SQL_CALC_FOUND_ROWS  p.id, p.name, p.price, p.width, p.height, p.length, p.weight, p.url, p.date_register
+            FROM
+                product p
+            INNER JOIN
+                product_category pc
+            ON
+                p.id = pc.id_product
+            INNER JOIN 
+                category c
+            ON
+                c.id = pc.id_category
+            WHERE c.id = ".$idCategory."
+            LIMIT ".$start.", ".$itensPerPage.";
+            SELECT FOUND_ROWS() AS whatever;
+            "
+        );
+
+        $data = [];
+        foreach($results as $value){
+            $product->setId($value['id']);
+            $product->setName($value['name']);
+            $product->setPrice($value['price']);
+            $product->setWidth($value['width']);
+            $product->setHeight($value['height']);
+            $product->setLength($value['length']);
+            $product->setWeight($value['weight']);
+            $product->setUrl($value['url']);
+            $product->setDateRegister($value['date_register']);
+            $product->setPhoto($productRepo->checkPhoto($value['id']));
+    
+            $i = [
+                'id'            => $product->getId(),
+                'name'          => $product->getName(),
+                'price'         => $product->getPrice(),
+                'width'         => $product->getWidth(),
+                'height'        => $product->getHeight(),
+                'length'        => $product->getLength(),
+                'weight'        => $product->getWeight(),
+                'url'           => $product->getUrl(),
+                'date_register' => $product->getDateRegister(),
+                'photo'         => $product->getPhoto(),
+            ];
+            array_push($data, $i);
+        }
+        
+        $result = $conn->select("SELECT count(*) AS nrtotal FROM product_category;");
+      
+        return [
+            'data'=>$data,
+            'total'=>(int)$result[0]['nrtotal'],
+            'pages'=>ceil($result[0]['nrtotal'] / $itensPerPage),
+        ];
+    }
 }

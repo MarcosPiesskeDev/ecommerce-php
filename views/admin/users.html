@@ -41,7 +41,7 @@
                     <td>{$value.name}</td>
                     <td>{$value.email}</td>
                     <td>{$value.username}</td/>
-                    <td>{if="$value.is_admin == 1"}Sim{else}Não{/if}</td>
+                    <td>{if="$value.is_admin == 0"}Sim{else}Não{/if}</td>
                     <td>
                       <a href="/admin/users/{$value.id}" class="btn btn-primary btn-xs"><i class="fa fa-edit"></i> Editar</a>
                       <a href="/admin/users/{$value.id}/delete" onclick="return confirm('Deseja realmente excluir este registro?')" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i> Excluir</a>

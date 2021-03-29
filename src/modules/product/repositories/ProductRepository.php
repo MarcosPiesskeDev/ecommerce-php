@@ -223,4 +223,68 @@ class ProductRepository implements IProduct{
                 p.id = '".$id."'
             ");
     }
+
+    public function getProductFromURL(string $url)
+    {
+        $product = new Product();
+        $conn = new MethodsDb();
+
+        $result = $conn->select(
+            "SELECT 
+                p.id, p.name, p.price, p.width, p.height, p.length, p.weight, p.url, p.date_register
+            FROM 
+                product p
+            WHERE
+                p.url = '".$url."'; 
+            "
+        );
+
+        $data = [];
+        foreach($result as $value){
+            $product->setId($value['id']);
+            $product->setName($value['name']);
+            $product->setPrice($value['price']);
+            $product->setWidth($value['width']);
+            $product->setHeight($value['height']);
+            $product->setLength($value['length']);
+            $product->setWeight($value['weight']);
+            $product->setUrl($value['url']);
+            $product->setDateRegister($value['date_register']);
+            $product->setPhoto($this->checkPhoto($value['id']));
+    
+            $i = [
+                'id'            => $product->getId(),
+                'name'          => $product->getName(),
+                'price'         => $product->getPrice(),
+                'width'         => $product->getWidth(),
+                'height'        => $product->getHeight(),
+                'length'        => $product->getLength(),
+                'weight'        => $product->getWeight(),
+                'url'           => $product->getUrl(),
+                'date_register' => $product->getDateRegister(),
+                'photo'         => $product->getPhoto(),
+            ];
+            array_push($data, $i);
+        }
+        return $data[0];
+    }
+
+    public function getCategoryFromURL(int $idProduct)
+    {
+        $conn = new MethodsDb();
+
+        $result = $conn->select(
+            "SELECT 
+	            c.id, c.category, c.date_register
+            FROM
+	            category c
+            INNER JOIN
+	            product_category pc
+            ON
+	            c.id = pc.id_category
+            WHERE pc.id_product = ".$idProduct.";
+            "
+        );
+        return $result;
+    }
 }

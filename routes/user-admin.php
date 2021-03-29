@@ -107,7 +107,7 @@ $app->post("/admin/users/create", function(){
 
    $passEncrypted = openssl_encrypt($_POST['password'], 'AES-256-CBC', pack('a16', getenv('SECRET')), 0, pack('a16',getenv('SECRET_IV')));
 
-   $_POST['is_admin'] = (isset($_POST['is_admin'])) ? 1 : 0;
+   $_POST['is_admin'] = (isset($_POST['is_admin'])) ? 0 : 1;
 
    $person->setName($_POST['name']);
    $person->setEmail($_POST['email']);
@@ -130,7 +130,7 @@ $app->post("/admin/users/:idUser", function($idUser){
 
    $userRepo = new UserRepository();
 
-   $_POST['is_admin'] = (isset($_POST['is_admin'])) ? 1 : 0;
+   $_POST['is_admin'] = (isset($_POST['is_admin'])) ? 0 : 1;
 
    $user = $userRepo->getUserAndPersonById($idUser);
 

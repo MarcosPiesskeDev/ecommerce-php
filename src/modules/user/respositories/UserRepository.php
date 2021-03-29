@@ -16,6 +16,39 @@ class UserRepository implements IUser{
 
     const SESSION = "User";
 
+    public static function getUserFromSession()
+    {
+        $user = new User();
+        if(isset($_SESSION[UserRepository::SESSION]) && (int)$_SESSION[UserRepository::SESSION]['id'] > 0){
+            $user->setId($_SESSION[UserRepository::SESSION][0]);
+            $user->setIdPerson($_SESSION[UserRepository::SESSION][1]);
+            $user->setUsername($_SESSION[UserRepository::SESSION][2]);
+            $user->setPassword($_SESSION[UserRepository::SESSION][3]);
+            $user->setIsAdmin($_SESSION[UserRepository::SESSION][4]);
+            $user->setDateRegister($_SESSION[UserRepository::SESSION][5]);
+        }
+        return $user;
+    }
+
+    public static function checkUserLogin($inAdmin = true)
+    {
+        if (empty($_SESSION[UserRepository::SESSION]) 
+        || 
+        !$_SESSION[UserRepository::SESSION] 
+        || 
+        !(int)$_SESSION[UserRepository::SESSION][0] > 0) {
+           return false;
+        }else{
+            if ($inAdmin === true && (bool)$_SESSION[UserRepository::SESSION][4] === true){
+                return true;
+            }else if ($inAdmin === false){
+                return true;
+            }else{
+                return false;
+            }
+        }
+    }
+
     public function login($username, $password): User
     {
         $conn = new MethodsDb();
@@ -66,13 +99,8 @@ class UserRepository implements IUser{
 
     public static function verifyLogin($inAdmin = true)
     {
-        if(empty($_SESSION[UserRepository::SESSION]) 
-        || 
-        !$_SESSION[UserRepository::SESSION] 
-        || 
-        !(int)$_SESSION[UserRepository::SESSION][0] > 0 
-        || 
-        (bool)$_SESSION[UserRepository::SESSION][1] !== $inAdmin){
+      
+        if (UserRepository::checkUserLogin($inAdmin)) {
             header('Location: /admin/login');
             exit;
         }

@@ -4,7 +4,6 @@ require __DIR__.'/../vendor/autoload.php';
 
 use HcodeEcom\modules\category\models\Category;
 use HcodeEcom\modules\category\repository\CategoryRepository;
-use HcodeEcom\modules\product\models\Product;
 use HcodeEcom\modules\product\repository\ProductRepository;
 use HcodeEcom\modules\user\repositories\UserRepository;
 use HcodeEcom\pages\Page;
@@ -85,13 +84,23 @@ $app->get("/admin/categories", function(){
 
  $app->get("/categories/:idCategory", function($idCategory){
    $categoryRepo = new CategoryRepository();
-
+   $page = (isset($_GET['page']) ? (int)$_GET['page'] : 1);
    $category = $categoryRepo->getCategoryById((int)$idCategory);
+
+   $pagination = $categoryRepo->getProductPages($idCategory, $page);
+   $pages = [];
+   for ($i=1; $i <= $pagination['pages']; $i++){
+      array_push($pages, [
+         'link'=>'/categories/'.$category['category']['id'].'?page='.$i,
+         'page'=>$i,
+      ]);
+   }
    
    $page = new Page();
    $page->setTpl('category', [
       'category' => $category['category'],
-      'products' => $categoryRepo->getProductsFromCategoryRelated((int)$idCategory),
+      'products' =>  $pagination['data'],
+      'pages'=>$pages,
    ]);
    exit();
 });

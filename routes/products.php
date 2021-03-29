@@ -4,6 +4,7 @@ require __DIR__.'/../vendor/autoload.php';
 use HcodeEcom\modules\product\models\Product;
 use HcodeEcom\modules\product\repository\ProductRepository;
 use HcodeEcom\modules\user\repositories\UserRepository;
+use HcodeEcom\pages\Page;
 use HcodeEcom\pages\PageAdmin;
 
 $app->get("/admin/products", function(){
@@ -77,6 +78,7 @@ $app->post("/admin/products/:idProduct", function($idProduct){
     $product->setHeight($_POST['height']);
     $product->setLength($_POST['length']);
     $product->setWeight($_POST['weight']);
+    $product->setUrl($_POST['url']);
     $product->setPhoto($_FILES['file']);
     
     $productRepo->updateProductById($idProduct, $product);
@@ -92,4 +94,15 @@ $app->get("/admin/products/:idProduct/delete", function($idProduct){
     $productRepo->deleteProductById($idProduct);
     header('Location: /admin/products');
     exit();
+});
+
+$app->get("/products/:url", function($url){
+    $productRepo = new ProductRepository();
+    $product = $productRepo->getProductFromURL($url);
+    
+    $page = new Page();
+    $page->setTpl('product-detail', [
+        'product' => $product,
+        'categories'=> $productRepo->getCategoryFromURL($product['id']),
+    ]);
 });
