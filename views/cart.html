@@ -137,6 +137,12 @@
     }else{
         span.innerHTML = 0;
     }
+
+    if (zipCode != 'undefined'){
+        document.getElementById("cep").value = zipCode; 
+    }else{
+        document.getElementById("cep").value = "";
+    }
     
-    document.getElementById("cep").value = zipCode; 
+    
 </script>

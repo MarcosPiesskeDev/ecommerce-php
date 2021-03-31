@@ -148,3 +148,32 @@ $app->post("/admin/users/:idUser", function($idUser){
    header("Location: /admin/users");
    exit();
 });
+
+$app->get("/login", function(){
+   
+   $page = new Page();
+   $page->setTpl("login", [
+      'error' => UserRepository::getErrorLogin(),
+   ]);
+});
+
+$app->post("/login", function(){
+
+   $userRepo = new UserRepository();
+
+   try{
+      $userRepo->login($_POST['login'], $_POST['password']);
+      header('Location: /checkout');
+   }catch(Exception $e){
+      UserRepository::setErrorLogin($e->getMessage());
+      header('Location: /login');
+   }
+   exit();
+});
+
+$app->get("/logout", function(){
+   UserRepository::logout();
+
+   header("Location: /login");
+   exit();
+});

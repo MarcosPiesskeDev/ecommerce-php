@@ -15,17 +15,19 @@ use HcodeEcom\modules\user\models\User;
 class UserRepository implements IUser{
 
     const SESSION = "User";
+    const LOGIN_ERROR = "UserError";
+    const REGISTER_ERROR = "UserRegisterError";
 
     public static function getUserFromSession()
     {
         $user = new User();
         if(isset($_SESSION[UserRepository::SESSION]) && (int)$_SESSION[UserRepository::SESSION]['id'] > 0){
-            $user->setId($_SESSION[UserRepository::SESSION][0]);
-            $user->setIdPerson($_SESSION[UserRepository::SESSION][1]);
-            $user->setUsername($_SESSION[UserRepository::SESSION][2]);
-            $user->setPassword($_SESSION[UserRepository::SESSION][3]);
-            $user->setIsAdmin($_SESSION[UserRepository::SESSION][4]);
-            $user->setDateRegister($_SESSION[UserRepository::SESSION][5]);
+            $user->setId($_SESSION[UserRepository::SESSION]['id']);
+            $user->setIdPerson($_SESSION[UserRepository::SESSION]['idPerson']);
+            $user->setUsername($_SESSION[UserRepository::SESSION]['username']);
+            $user->setPassword($_SESSION[UserRepository::SESSION]['password']);
+            $user->setIsAdmin($_SESSION[UserRepository::SESSION]['isAdmin']);
+            $user->setDateRegister($_SESSION[UserRepository::SESSION]['dateRegister']);
         }
         return $user;
     }
@@ -36,10 +38,10 @@ class UserRepository implements IUser{
         || 
         !$_SESSION[UserRepository::SESSION] 
         || 
-        !(int)$_SESSION[UserRepository::SESSION][0] > 0) {
+        !(int)$_SESSION[UserRepository::SESSION]['id'] > 0) {
            return false;
         }else{
-            if ($inAdmin === true && (bool)$_SESSION[UserRepository::SESSION][4] === true){
+            if ($inAdmin === true && (bool)$_SESSION[UserRepository::SESSION]['isAdmin'] === true){
                 return true;
             }else if ($inAdmin === false){
                 return true;
@@ -82,12 +84,12 @@ class UserRepository implements IUser{
             $user->setDateRegister($data['date_register']);
 
             $_SESSION[UserRepository::SESSION]  = [
-                $user->getId(),
-                $user->getIdPerson(),
-                $user->getUsername(),
-                $user->getPassword(),
-                $user->getIsAdmin(),
-                $user->getDateRegister()
+                'id'            => $user->getId(),
+                'idPerson'      => $user->getIdPerson(),
+                'username'      => $user->getUsername(),
+                'password'      => $user->getPassword(),
+                'isAdmin'       => $user->getIsAdmin(),
+                'dateRegister'  => $user->getDateRegister()
             ];
             
             return $user;
@@ -101,7 +103,11 @@ class UserRepository implements IUser{
     {
       
         if (UserRepository::checkUserLogin($inAdmin)) {
-            header('Location: /admin/login');
+            if ($inAdmin){
+                header('Location: /admin/login');
+            }else{
+                header('Location: /login');
+            }
             exit;
         }
     }
@@ -402,5 +408,43 @@ class UserRepository implements IUser{
             WHERE  
                 id = '".$idUser."'"
         );
+    }
+
+    public static function setErrorLogin($msg)
+    {
+        $_SESSION[UserRepository::LOGIN_ERROR] = $msg;   
+    }
+
+    public static function getErrorLogin()
+    {
+        $msg = (isset($_SESSION[UserRepository::LOGIN_ERROR]) && $_SESSION[UserRepository::LOGIN_ERROR]) ? $_SESSION[UserRepository::LOGIN_ERROR] : '';
+
+        UserRepository::clearErrorLogin();
+
+        return $msg;
+    }
+
+    public static function clearErrorLogin()
+    {
+        $_SESSION[UserRepository::LOGIN_ERROR] = NULL;
+    }
+
+    public static function setErrorRegister($msg)
+    {
+        $_SESSION[UserRepository::REGISTER_ERROR] = $msg;   
+    }
+
+    public static function getErrorRegister()
+    {
+        $msg = (isset($_SESSION[UserRepository::REGISTER_ERROR]) && $_SESSION[UserRepository::REGISTER_ERROR]) ? $_SESSION[UserRepository::REGISTER_ERROR] : '';
+
+        UserRepository::clearErrorLogin();
+
+        return $msg;
+    }
+
+    public static function clearErrorRegister()
+    {
+        $_SESSION[UserRepository::REGISTER_ERROR] = NULL;
     }
 }

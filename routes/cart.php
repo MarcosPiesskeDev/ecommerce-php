@@ -1,8 +1,10 @@
 <?php
 
+use HcodeEcom\modules\address\models\Address;
 use HcodeEcom\modules\cart\repository\CartRepository;
 use HcodeEcom\modules\product\models\Product;
 use HcodeEcom\modules\product\repository\ProductRepository;
+use HcodeEcom\modules\user\repositories\UserRepository;
 use HcodeEcom\pages\Page;
 
 
@@ -122,8 +124,21 @@ $app->post("/cart/freight", function(){
 
     $receiveData = $cartRepo->setFreightPriceByCart($cSession, $_POST['zipcode']);
 
-    header("Location: /cart?getTime=".(int)$receiveData ["resultXml"]->PrazoEntrega."&zipCode=".$receiveData['zipCode']);
+    header("Location: /cart?zipCode=".$receiveData['zipCode']."&getTime=".(int)$receiveData ["resultXml"]->PrazoEntrega);
     exit();
 });
 
+$app->get("/checkout", function(){
+    UserRepository::checkUserLogin(false);
+
+    $sCart = CartRepository::getCartFromSession();
+    
+    //$address = new Address();    
+
+    $page = new Page();
+
+    $page->setTpl("checkout", [
+
+    ]);
+});
 
