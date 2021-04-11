@@ -28,4 +28,11 @@ class MethodsDb{
         $stmt = $this->query($rawQuery, $params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);       
     }
+
+    public function insert($rawQuery)
+    {
+        $conn = new ConnectionDb();
+        $conn->getConn()->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $conn->getConn()->exec($rawQuery);
+    }
 }

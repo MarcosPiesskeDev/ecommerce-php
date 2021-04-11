@@ -8,6 +8,8 @@ $app = new Slim\Slim();
 
 require("src/utils/functions.php");
 require_once("routes/user-admin.php");
+require_once("routes/user.php");
+require_once("routes/profile.php");
 require_once("routes/cart.php");
 require_once("routes/forgot-pass.php");
 require_once("routes/categories.php");

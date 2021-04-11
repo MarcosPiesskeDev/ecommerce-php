@@ -16,15 +16,15 @@
     <div class="container">
         <div class="row">                
             <div class="col-md-6">
-                {if="$error != ''"}
+                {if="$errorLogin != ''"}
                 <div class="alert alert-danger">
-                    {$error}
+                    {$errorLogin}
                 </div>
                 {/if}
                 <form action="/login" id="login-form-wrap" class="login" method="post">
                     <h2>Access</h2>
                     <p class="form-row form-row-first">
-                        <label for="login">E-mail <span class="required">*</span>
+                        <label for="login">Username/E-mail <span class="required">*</span>
                         </label>
                         <input type="text" id="login" name="login" class="input-text">
                     </p>
@@ -47,10 +47,11 @@
             </div>
             <div class="col-md-6">
                 
+                {if="$errorRegister != ''"}
                 <div class="alert alert-danger">
-                    Error!
+                    {$errorRegister}
                 </div>
-
+                {/if}
                 <form id="register-form-wrap" action="/register" class="register" method="post">
                     <h2>Criar conta</h2>
                     <p class="form-row form-row-first">
@@ -63,18 +64,26 @@
                         </label>
                         <input type="email" id="email" name="email" class="input-text" value="">
                     </p>
+                    
+                    <p class="form-row form-row-last">
+                        <label for="usernameRegister">Username <span class="required">*</span>
+                            </label>
+                            <input type="text" id="usernameRegister" name="usernameRegister" class="input-text">
+                        </p>
+                        <div class="clear"></div>
+
+                    <p class="form-row form-row-last">
+                    <label for="passwordRegister">Password <span class="required">*</span>
+                        </label>
+                        <input type="password" id="passwordRegister" name="passwordRegister" class="input-text">
+                    </p>
+                    <div class="clear"></div>
+                    
                     <p class="form-row form-row-first">
                         <label for="phone">Phone
                         </label>
                         <input type="text" id="phone" name="phone" class="input-text" value="">
                     </p>
-                    <p class="form-row form-row-last">
-                        <label for="password">Password <span class="required">*</span>
-                        </label>
-                        <input type="password" id="password" name="password" class="input-text">
-                    </p>
-                    <div class="clear"></div>
-
                     <p class="form-row">
                         <input type="submit" value="Create" name="login" class="button">
                     </p>

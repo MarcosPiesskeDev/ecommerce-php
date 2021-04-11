@@ -1,0 +1,50 @@
+
+<div class="product-big-title-area">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="product-bit-title text-center">
+                    <h2>My Profile</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="single-product-area">
+    <div class="zigzag-bottom"></div>
+    <div class="container">
+        <div class="row">                
+            <div class="col-md-3">
+                {include="profile-menu"}
+            </div>
+            <div class="col-md-9">
+                {if="$profileMsg != ''"}
+                <div class="alert alert-success">
+                    {$profileMsg}
+                </div>
+                {/if}
+                {if="$profileError != ''"}
+                <div class="alert alert-danger">
+                    {$profileError}
+                </div>
+                {/if}                
+                <form method="post" action="/profile">
+                    <div class="form-group">
+                    <label for="name">Nome completo</label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="Type your name here" value="{$person.name}">
+                    </div>
+                    <div class="form-group">
+                    <label for="email">E-mail</label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Digite o e-mail aqui" value="{$person.email}">
+                    </div>
+                    <div class="form-group">
+                    <label for="nrPhone">Telefone</label>
+                    <input type="tel" class="form-control" id="nrPhone" name="nrPhone" placeholder="Digite o telefone aqui" value="{$person.nPhone}">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

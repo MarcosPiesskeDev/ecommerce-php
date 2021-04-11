@@ -17,6 +17,8 @@ class UserRepository implements IUser{
     const SESSION = "User";
     const LOGIN_ERROR = "UserError";
     const REGISTER_ERROR = "UserRegisterError";
+    const CHANGE_DATA_ERROR = 'ChangeUserDataError';
+    const CHANGE_DATA_SUCCESS = 'ChangeUserDataSuccess';
 
     public static function getUserFromSession()
     {
@@ -280,8 +282,85 @@ class UserRepository implements IUser{
     {
         $conn = new MethodsDb();
 
-        $conn->query("CALL p_user_delete('".$idUser."')");
+        $result = $conn->select(
+            "SELECT 
+                p.id AS id_person, p.name, p.email, u.id AS id_user, u.id_person AS id_user_person, u.username
+            FROM 
+                person p
+            INNER JOIN
+                user u
+            ON 
+                p.id = u.id_person
+            WHERE u.id = '".$idUser."';
+            "
+        );
+
+        if (!empty($result)){
+            $conn->query(
+                "DELETE 
+                FROM
+                    user
+                WHERE 
+                    id = '".(int)$result[0]['id_user']."';
+    
+                DELETE
+                FROM
+                    person
+                WHERE
+                    id = '".(int)$result[0]['id_user_person']."';
+                "
+            );
+        }
+
+       
+
+        var_dump($result[0]);
+        exit();
+        //$conn->query("CALL p_user_delete('".$idUser."')");
     }
+
+    public function usernameExists(string $username) : bool
+    {
+        $conn = new MethodsDb();
+
+        $result = $conn->select(
+            "SELECT 
+                u.id, u.username
+            FROM
+                user u
+            WHERE
+                u.username = '".$username."';
+            "
+        );
+
+        if ($result > 0 && !empty($result)){
+            return true;
+        }
+        return false;
+    }
+
+
+    public function emailExists(string $email) : bool
+    {
+        $conn = new MethodsDb();
+
+        $result = $conn->select(
+            "SELECT 
+                p.id, p.email
+            FROM
+                person p
+            WHERE
+                p.email = '".$email."';
+            "
+        );
+
+        if ($result > 0 && !empty($result)){
+            return true;
+        }
+        return false;
+    }
+
+
 
     public static function getUserByEmailToRecoverPass($email, $isAdmin = true)
     {
@@ -446,5 +525,43 @@ class UserRepository implements IUser{
     public static function clearErrorRegister()
     {
         $_SESSION[UserRepository::REGISTER_ERROR] = NULL;
+    }
+
+    public static function setErrorChangeData($msg)
+    {
+        $_SESSION[UserRepository::CHANGE_DATA_ERROR] = $msg;   
+    }
+
+    public static function getErrorChangeData()
+    {
+        $msg = (isset($_SESSION[UserRepository::CHANGE_DATA_ERROR]) && $_SESSION[UserRepository::CHANGE_DATA_ERROR]) ? $_SESSION[UserRepository::CHANGE_DATA_ERROR] : '';
+
+        UserRepository::clearErrorLogin();
+
+        return $msg;
+    }
+
+    public static function clearErrorChangeData()
+    {
+        $_SESSION[UserRepository::CHANGE_DATA_ERROR] = NULL;
+    }
+
+    public static function setSuccessChangeData($msg)
+    {
+        $_SESSION[UserRepository::CHANGE_DATA_SUCCESS] = $msg;   
+    }
+
+    public static function getSuccessChangeData()
+    {
+        $msg = (isset($_SESSION[UserRepository::CHANGE_DATA_SUCCESS]) && $_SESSION[UserRepository::CHANGE_DATA_SUCCESS]) ? $_SESSION[UserRepository::CHANGE_DATA_SUCCESS] : '';
+
+        UserRepository::clearErrorLogin();
+
+        return $msg;
+    }
+
+    public static function clearSuccessChangeData()
+    {
+        $_SESSION[UserRepository::CHANGE_DATA_SUCCESS] = NULL;
     }
 }

@@ -3,24 +3,11 @@
 require __DIR__.'/../vendor/autoload.php';
 
 use HcodeEcom\modules\person\models\Person;
-use HcodeEcom\modules\product\repository\ProductRepository;
 use HcodeEcom\modules\user\models\User;
 use HcodeEcom\modules\user\repositories\UserRepository;
-use HcodeEcom\pages\Page;
 use HcodeEcom\pages\PageAdmin;
 
 $app = new Slim\Slim();
-
-$app->get("/", function(){
-   $productRepo = new ProductRepository();
-   
-   $products = $productRepo->getAllProducts();
-   $page = new Page();
-   $page->setTpl("index", [
-      'products'=>$products
-   ]);
-});
-
 
 $app->get("/admin", function(){
 
@@ -146,34 +133,5 @@ $app->post("/admin/users/:idUser", function($idUser){
    $page->setTpl('users-update');
 
    header("Location: /admin/users");
-   exit();
-});
-
-$app->get("/login", function(){
-   
-   $page = new Page();
-   $page->setTpl("login", [
-      'error' => UserRepository::getErrorLogin(),
-   ]);
-});
-
-$app->post("/login", function(){
-
-   $userRepo = new UserRepository();
-
-   try{
-      $userRepo->login($_POST['login'], $_POST['password']);
-      header('Location: /checkout');
-   }catch(Exception $e){
-      UserRepository::setErrorLogin($e->getMessage());
-      header('Location: /login');
-   }
-   exit();
-});
-
-$app->get("/logout", function(){
-   UserRepository::logout();
-
-   header("Location: /login");
    exit();
 });

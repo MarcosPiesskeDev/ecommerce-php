@@ -11,6 +11,7 @@ class Address{
     private $state;
     private $country;
     private $zipCode;
+    private $nResidence;
     private $dateRegister;
     
     public function getId()
@@ -30,7 +31,7 @@ class Address{
 
     public function setIdPerson($idPerson)
     {
-        $this->idPerson = $$idPerson;
+        $this->idPerson = $idPerson;
     }
 
     public function getAddress()
@@ -91,6 +92,16 @@ class Address{
     public function setZipCode($zipCode)
     {
         $this->zipCode = $zipCode;
+    }
+
+    public function getNResidence()
+    {
+        return $this->nResidence;
+    }
+
+    public function setNResidence($nResidence)
+    {
+        $this->nResidence = $nResidence;
     }
 
     public function getDateRegister()

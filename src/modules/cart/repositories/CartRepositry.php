@@ -238,63 +238,66 @@ class CartRepository implements ICart{
         }
     }
 
-    public function getProductByIdCart(int $idCart)
+    public function getProductByIdCart($idCart)
     {
         $conn = new MethodsDb();
         $productRepo = new ProductRepository();
         $product = new Product();
 
-        $results = $conn->select(
-            "SELECT 
-                p.id, p.name, p.price, p.width, p.height, p.length, p.weight, p.url, p.date_register,
-                COUNT(*) AS amount, SUM(p.price) AS total_value
-            FROM
-                product_cart pc
-            INNER JOIN 
-                product p 
-            ON 
-                pc.id_product = p.id
-            WHERE
-                pc.id_cart = '".$idCart."' AND pc.date_removed IS NULL
-            GROUP BY
-                p.id, p.name, p.price, p.width, p.height, p.length, p.weight, p.url, p.date_register
-            ORDER BY
-                p.name;
-            "
-        );
+        if (!empty($idCart)){
+            $results = $conn->select(
+                "SELECT 
+                    p.id, p.name, p.price, p.width, p.height, p.length, p.weight, p.url, p.date_register,
+                    COUNT(*) AS amount, SUM(p.price) AS total_value
+                FROM
+                    product_cart pc
+                INNER JOIN 
+                    product p 
+                ON 
+                    pc.id_product = p.id
+                WHERE
+                    pc.id_cart = '".(int)$idCart."' AND pc.date_removed IS NULL
+                GROUP BY
+                    p.id, p.name, p.price, p.width, p.height, p.length, p.weight, p.url, p.date_register
+                ORDER BY
+                    p.name;
+                "
+            );
 
-        $data = [];
+            $data = [];
 
-        foreach($results as $value){
-            $product->setId($value['id']);
-            $product->setName($value['name']);
-            $product->setPrice($value['price']);
-            $product->setWidth($value['width']);
-            $product->setHeight($value['height']);
-            $product->setLength($value['length']);
-            $product->setWeight($value['weight']);
-            $product->setUrl($value['url']);
-            $product->setDateRegister($value['date_register']);
-            $product->setPhoto($productRepo->checkPhoto($value['id']));
-    
-            $i = [
-                'id'            => $product->getId(),
-                'name'          => $product->getName(),
-                'price'         => $product->getPrice(),
-                'width'         => $product->getWidth(),
-                'height'        => $product->getHeight(),
-                'length'        => $product->getLength(),
-                'weight'        => $product->getWeight(),
-                'url'           => $product->getUrl(),
-                'date_register' => $product->getDateRegister(),
-                'photo'         => $product->getPhoto(),
-                'amount'        => $value['amount'],
-                'total_value'    => $value['total_value'],
-            ];
-            array_push($data, $i);
+            foreach($results as $value){
+                $product->setId($value['id']);
+                $product->setName($value['name']);
+                $product->setPrice($value['price']);
+                $product->setWidth($value['width']);
+                $product->setHeight($value['height']);
+                $product->setLength($value['length']);
+                $product->setWeight($value['weight']);
+                $product->setUrl($value['url']);
+                $product->setDateRegister($value['date_register']);
+                $product->setPhoto($productRepo->checkPhoto($value['id']));
+        
+                $i = [
+                    'id'            => $product->getId(),
+                    'name'          => $product->getName(),
+                    'price'         => $product->getPrice(),
+                    'width'         => $product->getWidth(),
+                    'height'        => $product->getHeight(),
+                    'length'        => $product->getLength(),
+                    'weight'        => $product->getWeight(),
+                    'url'           => $product->getUrl(),
+                    'date_register' => $product->getDateRegister(),
+                    'photo'         => $product->getPhoto(),
+                    'amount'        => $value['amount'],
+                    'total_value'    => $value['total_value'],
+                ];
+                array_push($data, $i);
+            }
+            
+            return $data;
         }
-          
-        return $data;
+        return [];
     }
 
     public function getTotalProductByCartId(int $idCart)
@@ -407,19 +410,24 @@ class CartRepository implements ICart{
 		}
 	}
 
-    public function calculateTotalByCartId(int $idCart, string $zipCode = null)
+    public function calculateTotalByCartId($idCart, string $zipCode = null)
     {
-        if ($zipCode != null){
+        if (!empty($idCart)){
+            if ($zipCode != null){
 
-            $cart = $this->getCartById($idCart);
+                $cart = $this->getCartById((int)$idCart);
 
-            $total = $this->getTotalProductByCartId($idCart);
-            
-            return [
-                'subTotal' => $total['price'],
-                'total' => $total['price'] + $cart['freight'],
-            ];
+                $total = $this->getTotalProductByCartId((int)$idCart);
+                
+                return [
+                    'subTotal' => $total['price'],
+                    'total' => $total['price'] + $cart['freight'],
+                ];
+            }
         }
-       
+        return [
+            'subTotal' => 0,
+            'total' => 0,
+        ];
     }
 }

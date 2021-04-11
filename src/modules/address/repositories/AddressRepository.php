@@ -2,11 +2,14 @@
 
 namespace HcodeEcom\modules\address\repositories;
 
+use Exception;
 use HcodeEcom\db\MethodsDb;
 use HcodeEcom\modules\address\interfaces\IAddress;
 use HcodeEcom\modules\address\models\Address;
 
 class AddressRepository implements IAddress{
+
+    const SESSION_ERROR = "AddressError";
 
     public function getAllAddresses()
     {
@@ -102,18 +105,24 @@ class AddressRepository implements IAddress{
     {
         $conn = new MethodsDb();
 
-        $conn->query(
-            "INSERT INTO
-                address (id_person, address, complement, city, state, country, n_zipcode)
+        if ($address->getId() !== null || !empty($address->getId())){
+            $this->updateAddress($address->getId(), $address);
+            exit();
+        }
+
+        $conn->insert(
+            "INSERT INTO 
+                address(id_person, address, complement, city, country, state, n_zipcode, n_residence)
             VALUES
                 (
                     '".$address->getIdPerson()."',
-                    ".$address->getAddress().",
-                    ".$address->getComplement().",
-                    ".$address->getCity().",
-                    ".$address->getCountry()."
-                    ".$address->getState().",
-                    '".$address->getZipCode()."'
+                    '".$address->getAddress()."',
+                    '".$address->getComplement()."',
+                    '".$address->getCity()."',
+                    '".$address->getCountry()."',
+                    '".$address->getState()."',
+                    ".$address->getZipCode().",
+                    '".$address->getNResidence()."'
                 );    
             "
         );
@@ -126,7 +135,7 @@ class AddressRepository implements IAddress{
 
         $conn->query(
             "UPDATE
-	            address a
+	            address
             SET 
                 id_person  = '".$address->getIdPerson()."', 
                 address    = ".$address->getAddress().", 
@@ -135,8 +144,9 @@ class AddressRepository implements IAddress{
                 state 	   = ".$address->getState().", 
                 country	   = ".$address->getCountry().", 
                 n_zipcode  = '".$address->getZipCode()."',
+                n_residence = '".$address->getNResidence()."'
             WHERE
-                a.id = '".$idAddress."';
+                id = '".$idAddress."';
             "
         );
     }
@@ -154,4 +164,64 @@ class AddressRepository implements IAddress{
             "
         );
     }
+
+    public static function getAddressDataFromCep(string $zipCode)
+    {
+        $nZipCode = str_replace("-", "", $zipCode);
+        
+        $curl = curl_init();
+
+        curl_setopt($curl, CURLOPT_URL, "http://viacep.com.br/ws/".$nZipCode."/json/");
+        curl_setopt($curl, CURLOPT_HEADER, 0);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        
+        $data = json_decode(curl_exec($curl));
+
+        if(!empty($data->erro)){
+            throw new Exception("This zip code is not valid.");
+        }
+        
+        curl_close($curl);
+
+        return $data;    
+    }
+
+    public function setAddressDataFromCep(Address $address, string $zipCode)
+    {
+        $data = AddressRepository::getAddressDataFromCep($zipCode);
+
+        if (isset($data->logradouro) && $data->logradouro){
+            $address->setAddress($data->logradouro.", ".$data->bairro);
+            $address->setComplement($data->complemento);
+            $address->setCity($data->localidade);
+            $address->setState($data->uf);
+            $address->setCountry('Brazil');
+            $address->setZipCode($zipCode);
+        }
+    }
+
+    public static function setMsgError($msg)
+	{
+
+		$_SESSION[AddressRepository::SESSION_ERROR] = $msg;
+
+	}
+
+	public static function getMsgError()
+	{
+
+		$msg = (isset($_SESSION[AddressRepository::SESSION_ERROR])) ? $_SESSION[AddressRepository::SESSION_ERROR] : "";
+
+		AddressRepository::clearMsgError();
+
+		return $msg;
+
+	}
+
+	public static function clearMsgError()
+	{
+
+		$_SESSION[AddressRepository::SESSION_ERROR] = NULL;
+
+	}
 }
